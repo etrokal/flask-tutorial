@@ -25,7 +25,7 @@ def close_db(e=None) -> None:
 
 
 def init_db() -> None:
-    db = get_db()
+    db: sqlite3.Connection = get_db()
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
@@ -41,6 +41,6 @@ sqlite3.register_converter(
     'timestamp', lambda v: datetime.fromisoformat(v.decode()))
 
 
-def init_app(app: Flask):
+def init_app(app: Flask) -> None:
     app.teardown_appcontext(f=close_db)
     app.cli.add_command(cmd=init_db_command, name='init-db')
