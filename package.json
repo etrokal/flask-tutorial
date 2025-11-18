@@ -1,0 +1,28 @@
+{
+  "name": "blog-flask",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "prettier": "^3.6.2",
+    "prettier-plugin-jinja-template": "^2.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/etrokal/flask-tutorial.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/etrokal/flask-tutorial/issues"
+  },
+  "homepage": "https://github.com/etrokal/flask-tutorial#readme"
+}

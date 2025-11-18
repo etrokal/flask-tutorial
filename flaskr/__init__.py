@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def create_app(test_config:  Mapping[str, Any] | None = None) -> Flask:
 
     # create and configure the app
@@ -38,5 +39,9 @@ def create_app(test_config:  Mapping[str, Any] | None = None) -> Flask:
 
     from . import auth
     app.register_blueprint(auth.bp)
+
+    from . import blog
+    app.register_blueprint(blog.bp)
+    app.add_url_rule('/', endpoint='index')
 
     return app

@@ -4,6 +4,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 
+from werkzeug import Response
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flaskr.db import get_db
@@ -44,7 +45,7 @@ def register():
 
 
 @bp.route('/login', methods=('GET', 'POST'))
-def login():
+def login() -> Response | str:
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -65,6 +66,13 @@ def login():
         flash(error)
 
     return render_template('auth/login.jinja')
+
+
+@bp.route('/logout', methods=('GET',))
+def logout():
+    session.clear()
+    flash('User logged out.')
+    return redirect(url_for('index'))
 
 
 def login_required(view):
