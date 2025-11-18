@@ -15,5 +15,5 @@ dist/
 build/
 *.egg-info/
 
-nodemodules/
+node_modules/
 
