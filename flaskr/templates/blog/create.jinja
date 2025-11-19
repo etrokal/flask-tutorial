@@ -14,7 +14,7 @@
       value="{{ request.form.title }}"
     />
     <label for="body">Body</label>
-    <input type="text" name="body" id="body" value="{{ request.form.body }}" />
+    <textarea name="body" id="body">{{ request.form.body }}</textarea>
     <input type="submit" value="Save" />
   </form>
 {% endblock content %}

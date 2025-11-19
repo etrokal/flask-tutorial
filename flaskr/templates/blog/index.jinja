@@ -22,9 +22,9 @@
           </div>
         </div>
         {% if g.user.id == post.author_id %}
-          <a href="{{ url_for('blog.update', id=post.id) }}" class="action"
-            >Edit</a
-          >
+          <a href="{{ url_for('blog.update', id=post.id) }}" class="action">
+            Edit
+          </a>
         {% endif %}
       </header>
       <p class="body">{{ post.body }}</p>
@@ -33,6 +33,7 @@
       <hr />
     {% endif %}
   {% endfor %}
+
   {% if g.user is not none %}
     <a href="{{ url_for('blog.create') }}">Create Post</a>
   {% endif %}

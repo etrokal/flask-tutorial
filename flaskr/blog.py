@@ -1,6 +1,6 @@
 
 
-from flask import Blueprint, flash, g, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
 
 from flaskr.auth import login_required
 from flaskr.db import get_db
@@ -30,6 +30,8 @@ def create():
 
         if not title:
             error = 'Title is required.'
+        elif not body:
+            error = "Body is required."
 
         if error is not None:
             flash(error)
@@ -44,3 +46,45 @@ def create():
             return redirect(url_for('blog.index'))
 
     return render_template('blog/create.jinja')
+
+@bp.route('/update/<id>', methods=('GET', 'POST'))
+@login_required
+def update(id):
+    db = get_db()
+    user = g.user
+
+    post = db.execute(
+        'SELECT * FROM post WHERE id = ?',
+        (id)
+    ).fetchone()
+
+    if not post:
+        abort(404)
+
+    if post['author_id'] != user['id']:
+        abort(403)
+
+    if request.method == 'POST':
+        title = request.form['title']
+        body = request.form['body']
+
+        error = None
+
+        if not title:
+            error = "Title is required."
+        elif not body:
+            error = "Body is required."
+
+        if not error:
+            db.execute(
+                'UPDATE post SET title=?, body=? WHERE id=?',
+                (title, body, id)
+            )
+            db.commit()
+            flash("Post updated successfully.")
+            return redirect(url_for("index"))
+        else:
+            flash(error)
+
+    return render_template("blog/update.jinja", title=post['title'], body=post['body'])
+
