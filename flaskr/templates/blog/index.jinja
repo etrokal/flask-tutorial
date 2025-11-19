@@ -7,7 +7,7 @@
     {% endblock title %}
   </h1>
   {% if g.user %}
-    <a href="{{ url_for('blog.create') }}" class="action">New</a>
+    <a href="{{ url_for('blog.create') }}" class="action">New Post</a>
   {% endif %}
 {% endblock header %}
 
@@ -33,8 +33,4 @@
       <hr />
     {% endif %}
   {% endfor %}
-
-  {% if g.user is not none %}
-    <a href="{{ url_for('blog.create') }}">Create Post</a>
-  {% endif %}
 {% endblock content %}

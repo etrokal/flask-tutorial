@@ -1,5 +1,6 @@
 
 
+from tabnanny import check
 from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
 
 from flaskr.auth import login_required
@@ -47,22 +48,12 @@ def create():
 
     return render_template('blog/create.jinja')
 
+
 @bp.route('/update/<id>', methods=('GET', 'POST'))
 @login_required
 def update(id):
     db = get_db()
-    user = g.user
-
-    post = db.execute(
-        'SELECT * FROM post WHERE id = ?',
-        (id)
-    ).fetchone()
-
-    if not post:
-        abort(404)
-
-    if post['author_id'] != user['id']:
-        abort(403)
+    post = get_post(id)
 
     if request.method == 'POST':
         title = request.form['title']
@@ -75,7 +66,7 @@ def update(id):
         elif not body:
             error = "Body is required."
 
-        if not error:
+        if error is None:
             db.execute(
                 'UPDATE post SET title=?, body=? WHERE id=?',
                 (title, body, id)
@@ -86,5 +77,41 @@ def update(id):
         else:
             flash(error)
 
-    return render_template("blog/update.jinja", title=post['title'], body=post['body'])
+    return render_template("blog/update.jinja", title=post['title'], body=post['body'], id=post['id'])
 
+@bp.route('/delete/<id>', methods=('GET', 'POST'))
+def delete(id):
+    delete_post(id)
+
+    flash("Post deleted successfuly.")
+    return redirect(url_for('index'))
+
+
+def get_post(id, check_author=True):
+    db = get_db()
+
+    post = db.execute(
+        'SELECT * FROM post WHERE id = ?',
+        (id)
+    ).fetchone()
+
+    if not post:
+        abort(404, f"Post with id {id} doesn't exist.")
+
+    if check_author and post['author_id'] != g.user['id']:
+        abort(403)
+
+    return post
+
+def delete_post(id, check_author=True):
+    db = get_db()
+
+    post = get_post(id, check_author)
+
+    db.execute(
+        'DELETE FROM post WHERE id = ?',
+        (id)
+    )
+    db.commit()
+
+    return post
