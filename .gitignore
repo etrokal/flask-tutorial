@@ -1,6 +1,6 @@
 .venv/
 
-flasr/.env
+flaskr/.env
 
 *.pyc
 __pycache__/
