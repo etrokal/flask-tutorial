@@ -13,7 +13,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/register', methods=('GET', 'POST'))
-def register():
+def register() -> Response | str:
     if request.method == 'POST':
         username: str = request.form['username']
         password: str = request.form['password']
@@ -37,9 +37,8 @@ def register():
             else:
                 flash('User registered successfuly.')
                 return redirect(url_for("auth.login"))
-        else:
-            g.username = username
-            flash(error, "error")
+        
+        flash(error, "error")
 
     return render_template('auth/register.jinja')
 
@@ -79,6 +78,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
+            flash('Log In required')
             return redirect(url_for('auth.login'))
 
         return view(**kwargs)

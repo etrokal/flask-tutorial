@@ -49,7 +49,7 @@ def create():
     return render_template('blog/create.jinja')
 
 
-@bp.route('/update/<id>', methods=('GET', 'POST'))
+@bp.route('/<id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
     db = get_db()
@@ -79,7 +79,8 @@ def update(id):
 
     return render_template("blog/update.jinja", title=post['title'], body=post['body'], id=post['id'])
 
-@bp.route('/delete/<id>', methods=('GET', 'POST'))
+@bp.route('/<id>/delete', methods=('GET', 'POST'))
+@login_required
 def delete(id):
     delete_post(id)
 

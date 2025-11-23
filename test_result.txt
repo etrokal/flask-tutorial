@@ -1,0 +1,100 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.1, pluggy-1.6.0
+rootdir: /home/marcelo/projects/flask-tutorial
+configfile: pyproject.toml
+testpaths: tests
+collected 24 items
+
+tests/test_auth.py ...F....                                              [ 33%]
+tests/test_blog.py F......FF...                                          [ 83%]
+tests/test_db.py ..                                                      [ 91%]
+tests/test_factory.py ..                                                 [100%]
+
+=================================== FAILURES ===================================
+__________ test_register_validate_input[test-test-already registered] __________
+
+client = <FlaskClient <Flask 'flaskr'>>, username = 'test', password = 'test'
+message = b'already registered'
+
+    @pytest.mark.parametrize(('username', 'password', 'message'), (
+        ('', '', b'Username is required'),
+        ('a', '', b'Password is required'),
+        ('test', 'test', b'already registered'),
+    ))
+    def test_register_validate_input(client, username, password, message):
+        response = client.post(
+            '/auth/register',
+            data={'username': username, 'password': password}
+        )
+    
+        print(response.data)
+>       assert message in response.data
+E       assert b'already registered' in b'<!doctype html>\n\n<head>\n  <title>Register - Flaskr</title>\n  <link rel="stylesheet" href="/static/style.css" />\...="password" name="password" id="password">\n  <input type="submit" value="Register">\n</form>\n\n  </section>\n</body>'
+E        +  where b'<!doctype html>\n\n<head>\n  <title>Register - Flaskr</title>\n  <link rel="stylesheet" href="/static/style.css" />\...="password" name="password" id="password">\n  <input type="submit" value="Register">\n</form>\n\n  </section>\n</body>' = <WrapperTestResponse 682 bytes [200 OK]>.data
+
+tests/test_auth.py:32: AssertionError
+----------------------------- Captured stdout call -----------------------------
+b'<!doctype html>\n\n<head>\n  <title>Register - Flaskr</title>\n  <link rel="stylesheet" href="/static/style.css" />\n</head>\n\n<body>\n  <nav>\n    <h1>Flaskr</h1>\n    <ul>\n      \n        <li><a href="/auth/register">Register</a></li>\n        <li><a href="/auth/login">Log In</a></li>\n      \n    </ul>\n  </nav>\n  <section class="content">\n    <header>\n<h1>Register</h1>\n</header>\n    \n    \n<form action="" method="post">\n  <label for="username">Username</label>\n  <input type="text" name="username" id="username" value="">\n  <label for="password">Password</label>\n  <input type="password" name="password" id="password">\n  <input type="submit" value="Register">\n</form>\n\n  </section>\n</body>'
+__________________________________ test_index __________________________________
+
+client = <FlaskClient <Flask 'flaskr'>>
+auth = <conftest.AuthActions object at 0x75108f513950>
+
+    def test_index(client, auth):
+        response = client.get('/')
+        assert b'Log In' in response.data
+        assert b'Register' in response.data
+    
+        auth.login()
+        response = client.get('/')
+        assert b'Log Out' in response.data
+        assert b'test title' in response.data
+        assert b'by test on 2018-01-01' in response.data
+>       assert b'testg\nbody' in response.data
+E       assert b'testg\nbody' in b'<!doctype html>\n\n<head>\n  <title>\n      Posts\n     - Flaskr</title>\n  <link rel="stylesheet" href="/static/sty...a>\n        \n      </header>\n      <p class="body">test\nbody</p>\n    </article>\n    \n  \n\n  </section>\n</body>'
+E        +  where b'<!doctype html>\n\n<head>\n  <title>\n      Posts\n     - Flaskr</title>\n  <link rel="stylesheet" href="/static/sty...a>\n        \n      </header>\n      <p class="body">test\nbody</p>\n    </article>\n    \n  \n\n  </section>\n</body>' = <WrapperTestResponse 825 bytes [200 OK]>.data
+
+tests/test_blog.py:15: AssertionError
+_________________________________ test_create __________________________________
+
+client = <FlaskClient <Flask 'flaskr'>>
+auth = <conftest.AuthActions object at 0x75108f5675c0>, app = <Flask 'flaskr'>
+
+    def test_create(client, auth, app):
+        auth.login()
+        assert client.get('/create').status_code == 200
+        client.post('/create', data={'title': 'created', 'body': ''})
+    
+        with app.app_context():
+            db = get_db()
+            count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
+>           assert count == 2
+E           assert 1 == 2
+
+tests/test_blog.py:61: AssertionError
+_________________________________ test_update __________________________________
+
+client = <FlaskClient <Flask 'flaskr'>>
+auth = <conftest.AuthActions object at 0x75108f53e720>, app = <Flask 'flaskr'>
+
+    def test_update(client, auth, app):
+        auth.login()
+        assert client.get('/1/update').status_code == 200
+        client.post('/1/update', data={'title': 'updated', 'body': ''})
+    
+        with app.app_context():
+            db = get_db()
+            post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
+>           assert post['title'] == 'updated'
+E           AssertionError: assert 'test title' == 'updated'
+E             
+E             - updated
+E             + test title
+
+tests/test_blog.py:72: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_auth.py::test_register_validate_input[test-test-already registered]
+FAILED tests/test_blog.py::test_index - assert b'testg\nbody' in b'<!doctype ...
+FAILED tests/test_blog.py::test_create - assert 1 == 2
+FAILED tests/test_blog.py::test_update - AssertionError: assert 'test title' ...
+========================= 4 failed, 20 passed in 0.81s =========================
